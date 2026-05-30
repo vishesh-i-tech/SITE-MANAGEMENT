@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INDORKAR Construction | Site & Logistics Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="obsidian-theme">
+
+  <!-- ==========================================
+       1. AUTHENTICATION VIEW
+       ========================================== -->
+  <div id="auth-view" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <span>⚡</span> INDORKAR Site Mgmt
+        </div>
+        <p class="auth-subtitle">Construction Enterprise Portal</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-identifier">Email or Phone Number</label>
+          <input type="text" id="login-identifier" required placeholder="admin@site.com or 9876543210" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary">
+          Authenticate Session &rarr;
+        </button>
+      </form>
+
+      <div class="auth-demo-hint">
+        <strong>⚡ DEMO CREDENTIALS:</strong><br>
+        • Email: <code>admin@site.com</code> (Password: <code>password</code>)<br>
+        • Phone: <code>9876543210</code> (Password: <code>password</code>)
+      </div>
+
+      <div class="auth-footer">
+        Secured by INDORKAR Infrastructure Group
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       2. SPA MAIN APPLICATION VIEW
+       ========================================== -->
+  <div id="app-view" class="app-frame" style="display: none;">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">INDORKAR<span>Site</span></div>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li class="menu-item active" data-target="dashboard-section">
+          <button>📊 Dashboard Overview</button>
+        </li>
+        <li class="menu-item" data-target="labor-section">
+          <button>👷 Labor & Wages</button>
+        </li>
+        <li class="menu-item" data-target="inventory-section">
+          <button>🔧 Tools & Equipment</button>
+        </li>
+        <li class="menu-item" data-target="machinery-section">
+          <button>🚜 Machinery & Fuel</button>
+        </li>
+        <li class="menu-item" data-target="comparison-section">
+          <button>⚖️ Site Comparison</button>
+        </li>
+      </ul>
+
+      <div class="sidebar-user">
+        <div class="user-info">
+          <div id="sidebar-user-name" class="user-name">-</div>
+          <div id="sidebar-user-role" class="user-role">-</div>
+        </div>
+        <button id="btn-logout" class="btn-logout" title="Log Out">✕</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Workspace -->
+    <main class="app-content">
+      <!-- Shared Header -->
+      <header class="header-container">
+        <div class="header-title-group">
+          <h1 id="page-title">Dashboard Overview</h1>
+          <p id="page-subtitle">Site-segregated financials and logistics tracking</p>
+        </div>
+
+        <div class="site-selector-container">
+          <label for="active-site-select" style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Active Project:</label>
+          <select id="active-site-select" class="site-dropdown">
+            <!-- Populated dynamically -->
+          </select>
+          <button id="btn-create-site" class="btn-add-site">+ Add Project</button>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           2A. DASHBOARD VIEW
+           ========================================== -->
+      <section id="dashboard-section" class="spa-section">
+        <!-- Site Summary Details Widget -->
+        <div class="glass-card" style="margin-bottom: 30px;">
+          <div class="glass-card-header">
+            <h2>Project Metadata & Spec Sheet</h2>
+            <div id="site-type-badge" class="badge info">Type: -</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="form-group">
+              <label>Location details</label>
+              <div id="site-meta-location" style="font-size: 1.1rem; font-weight: 600; color: var(--text-white);">-</div>
+            </div>
+            <div class="form-group">
+              <label>Commencement Date</label>
+              <div id="site-meta-start-date" style="font-size: 1.1rem; font-weight: 600; color: var(--text-white);">-</div>
+            </div>
+            <div class="form-group">
+              <label>Project Duration</label>
+              <div id="site-meta-duration" style="font-size: 1.1rem; font-weight: 600; color: var(--text-white);">-</div>
+            </div>
+            <div class="form-group">
+              <label>Contract Value (Budget)</label>
+              <div id="site-meta-budget" style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="metrics-row">
+          <div class="metric-card primary">
+            <span class="metric-label">Overall Investments</span>
+            <div id="dash-metric-investment" class="metric-val">₹0</div>
+            <span class="metric-sub">Sum of wages, materials, fuel, rent</span>
+          </div>
+          <div class="metric-card success">
+            <span class="metric-label">Project Profit</span>
+            <div id="dash-metric-profit" class="metric-val">₹0</div>
+            <span class="metric-sub">Budget minus expenses</span>
+          </div>
+          <div class="metric-card danger">
+            <span class="metric-label">Project Loss</span>
+            <div id="dash-metric-loss" class="metric-val">₹0</div>
+            <span class="metric-sub">Excess over-budget</span>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="dashboard-grid">
+          <!-- Financial Breakdown Card -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h2>Expense Allocations</h2>
+            </div>
+            <div class="attendance-table-container">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Calculated Cost</th>
+                    <th>Share Percentage</th>
+                  </tr>
+                </thead>
+                <tbody id="expense-breakdown-body">
+                  <!-- Generated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Active Crew & Fleet List -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h2>Site Assets Quick-List</h2>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-blue);">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Wages & Operations</div>
+                <div id="dash-quick-labor" style="font-size: 1.2rem; font-weight: 700; color: var(--text-white); margin-top: 4px;">-</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--primary);">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Active Equipment Sent</div>
+                <div id="dash-quick-tools" style="font-size: 1.2rem; font-weight: 700; color: var(--text-white); margin-top: 4px;">-</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-pink);">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Active Machinery & Fuel</div>
+                <div id="dash-quick-machinery" style="font-size: 1.2rem; font-weight: 700; color: var(--text-white); margin-top: 4px;">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           2B. LABOR & ATTENDANCE SECTION
+           ========================================== -->
+      <section id="labor-section" class="spa-section" style="display: none;">
+        <div class="metrics-row">
+          <div class="metric-card primary">
+            <span class="metric-label">Daily Headcount</span>
+            <div id="labor-metric-headcount" class="metric-val">0</div>
+            <span class="metric-sub">Workers active today</span>
+          </div>
+          <div class="metric-card success">
+            <span class="metric-label">Paid Wages</span>
+            <div id="labor-metric-paid" class="metric-val">₹0</div>
+            <span class="metric-sub">Wages & advances disbursed</span>
+          </div>
+          <div class="metric-card danger">
+            <span class="metric-label">Outstanding Balance</span>
+            <div id="labor-metric-outstanding" class="metric-val">₹0</div>
+            <span class="metric-sub">Unpaid wages due</span>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Daily Attendance Sheet -->
+          <div class="glass-card">
+            <div class="attendance-header">
+              <h2>Labor Attendance Log</h2>
+              <div class="attendance-date-picker">
+                <input type="date" id="attendance-date-select">
+                <button id="btn-add-laborer" class="btn-add-site" style="padding: 8px 16px;">+ Register Worker</button>
+              </div>
+            </div>
+            <div class="attendance-table-container">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Labor Name</th>
+                    <th>Standard Wage</th>
+                    <th>Attendance Check</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Register Wages & Advances Card -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h2>Register Payroll / Advance</h2>
+            </div>
+            <form id="payroll-log-form">
+              <div class="form-group">
+                <label for="pay-laborer-select">Laborer</label>
+                <select id="pay-laborer-select" required>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pay-type-select">Transaction Type</label>
+                <select id="pay-type-select" required>
+                  <option value="Wage Settlement">Wage Settlement</option>
+                  <option value="Advance Payment">Advance Payment</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pay-amount-input">Amount (₹)</label>
+                <input type="number" id="pay-amount-input" min="0" required placeholder="500">
+              </div>
+              <div class="form-group">
+                <label for="pay-outstanding-input">Outstanding Wage (₹)</label>
+                <input type="number" id="pay-outstanding-input" min="0" value="0" placeholder="0">
+              </div>
+              <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
+                Record Payroll Entry
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Historic Labor Payments Ledger -->
+        <div class="glass-card" style="margin-top: 30px;">
+          <div class="glass-card-header">
+            <h2>Labor Payroll Registry Ledger</h2>
+          </div>
+          <div class="attendance-table-container">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Laborer</th>
+                  <th>Payment Type</th>
+                  <th>Disbursed Amount</th>
+                  <th>Advance Paid</th>
+                  <th>Outstanding Balance</th>
+                </tr>
+              </thead>
+              <tbody id="labor-payments-ledger-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           2C. TOOLS & EQUIPMENT TRACKING SECTION
+           ========================================== -->
+      <section id="inventory-section" class="spa-section" style="display: none;">
+        <!-- Inventory Dispatch Controls -->
+        <div class="glass-card" style="margin-bottom: 30px;">
+          <div class="glass-card-header">
+            <h2>Dispatch Tools & Equipment to Site</h2>
+            <button id="btn-create-catalog-item" class="btn-secondary" style="padding: 6px 12px;">+ Add Custom Catalog Tool</button>
+          </div>
+          <form id="tool-dispatch-form" class="dispatch-form-inline">
+            <div class="form-group">
+              <label for="dispatch-tool-select">Select Tool</label>
+              <select id="dispatch-tool-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dispatch-size-select">Size Specifics</label>
+              <select id="dispatch-size-select" required>
+                <!-- Populated dynamically -->
+              </select>
+              <div id="dispatch-custom-size-group" style="display: none; margin-top: 10px;">
+                <input type="text" id="dispatch-custom-size-input" placeholder="Enter custom size (e.g. 6x4 feet)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="dispatch-qty-input">Quantity Sent</label>
+              <input type="number" id="dispatch-qty-input" min="1" required placeholder="50">
+            </div>
+            <div class="form-group">
+              <label for="dispatch-rent-input">Rent Charge (₹/item/day) - <span style="font-size:0.8rem; color:var(--text-muted); text-transform:none;">Optional</span></label>
+              <input type="number" id="dispatch-rent-input" min="0" placeholder="0">
+            </div>
+            <button type="submit" class="btn-primary" style="margin-bottom: 0;">
+              ⚡ Dispatch Items
+            </button>
+          </form>
+        </div>
+
+        <!-- Terminal Logs Stream -->
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <h2>Active Deployments Ledger</h2>
+          </div>
+          
+          <div class="attendance-table-container">
+            <table class="app-table">
+              <thead>
+                <tr>
+                  <th>Dispatched Tool (Size)</th>
+                  <th>Sent Qty</th>
+                  <th>Returned Qty</th>
+                  <th>Logistics Time-Stamps</th>
+                  <th>Rent Charges</th>
+                  <th>Damages & Repair Costs</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-deployments-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Retro Console for Logistics Terminal -->
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-controls">
+                <div class="ctrl-btn close"></div>
+                <div class="ctrl-btn min"></div>
+                <div class="ctrl-btn max"></div>
+              </div>
+              <div class="terminal-title">INDORKAR LOGISTICS TIMESTAMPS ENGINE v1.0.4</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">ONLINE</div>
+            </div>
+            <div id="terminal-body" class="terminal-body">
+              <!-- Logs populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           2D. MACHINERY & MATERIAL LOGS SECTION
+           ========================================== -->
+      <section id="machinery-section" class="spa-section" style="display: none;">
+        <div class="dashboard-grid">
+          <!-- Material volume tracking -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h2>Record Construction Materials</h2>
+            </div>
+            <form id="material-usage-form">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group">
+                  <label for="mat-type-select">Material Type</label>
+                  <select id="mat-type-select" required>
+                    <option value="Cement (bags)">Cement (bags)</option>
+                    <option value="Sand (brass)">Sand (brass)</option>
+                    <option value="Gravel (brass)">Gravel (brass)</option>
+                    <option value="Steel (tons)">Steel (tons)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="mat-qty-input">Volume / Quantity</label>
+                  <input type="number" id="mat-qty-input" min="0.1" step="any" required placeholder="100">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group">
+                  <label for="mat-cost-input">Direct cost (₹)</label>
+                  <input type="number" id="mat-cost-input" min="0" required placeholder="43000">
+                </div>
+                <div class="form-group">
+                  <label for="mat-date-input">Usage Date</label>
+                  <input type="date" id="mat-date-input" required>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary" style="width: 100%;">
+                Log Material Volume Usage
+              </button>
+            </form>
+
+            <div class="attendance-table-container" style="margin-top: 30px;">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Date Logged</th>
+                    <th>Material Type</th>
+                    <th>Volume Used</th>
+                    <th>Acquisition Cost</th>
+                  </tr>
+                </thead>
+                <tbody id="materials-log-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Machinery & Fuel tracking -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h2>Fleet Operations & Fuel Logging</h2>
+            </div>
+            <form id="machinery-log-form">
+              <div class="form-group">
+                <label for="mach-type-select">Machinery / Fleet Unit</label>
+                <select id="mach-type-select" required>
+                  <option value="Concrete Mixer">Concrete Mixer</option>
+                  <option value="Tractor">Tractor</option>
+                  <option value="Tanker">Tanker</option>
+                  <option value="Accessories">Accessories (Custom Name)</option>
+                </select>
+              </div>
+              <div class="form-group" id="mach-custom-group" style="display: none;">
+                <label for="mach-custom-name">Accessories Name</label>
+                <input type="text" id="mach-custom-name" placeholder="Enter accessory name (e.g. Drilling Rig)">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group">
+                  <label for="mach-fuel-input">Fuel Used (Liters)</label>
+                  <input type="number" id="mach-fuel-input" min="0.1" step="any" required placeholder="25">
+                </div>
+                <div class="form-group">
+                  <label for="mach-fuel-cost-input">Fuel Expense (₹)</label>
+                  <input type="number" id="mach-fuel-cost-input" min="0" required placeholder="2500">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group">
+                  <label for="mach-hours-input">Running Time (Hours)</label>
+                  <input type="number" id="mach-hours-input" min="0.1" step="any" required placeholder="6">
+                </div>
+                <div class="form-group">
+                  <label for="mach-run-cost-input">Running Cost (₹)</label>
+                  <input type="number" id="mach-run-cost-input" min="0" required placeholder="1800">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label for="mach-desc-input">Usage Description - <span style="font-size:0.8rem; color:var(--text-muted); text-transform:none;">Optional</span></label>
+                <input type="text" id="mach-desc-input" placeholder="e.g. Transported bricks to Sector A / Deployed for excavation">
+              </div>
+              <button type="submit" class="btn-primary" style="width: 100%;">
+                Log Fleet Run & Fuel Expenses
+              </button>
+            </form>
+
+            <div class="fuel-logs-timeline" style="margin-top: 30px;" id="machinery-timeline-container">
+              <!-- Dynamically populated timelines -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           2E. SITE COMPARISON ENGINE SECTION
+           ========================================== -->
+      <section id="comparison-section" class="spa-section" style="display: none;">
+        <div class="glass-card" style="margin-bottom: 30px;">
+          <div class="glass-card-header">
+            <h2>Select Projects to Compare Side-by-Side</h2>
+          </div>
+          <div class="comparison-container">
+            <!-- Selection site A -->
+            <div class="form-group">
+              <label for="compare-site-a">First Project (A)</label>
+              <select id="compare-site-a" class="comparison-selector">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            <!-- Selection site B -->
+            <div class="form-group">
+              <label for="compare-site-b">Second Project (B)</label>
+              <select id="compare-site-b" class="comparison-selector">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="comparison-container">
+          <!-- Comparison Panel A -->
+          <div id="compare-panel-a" class="comparison-column highlight">
+            <!-- Loaded dynamically -->
+          </div>
+
+          <!-- Comparison Panel B -->
+          <div id="compare-panel-b" class="comparison-column">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==========================================
+       3. SYSTEM MODAL DIALOGS OVERLAYS
+       ========================================== -->
+
+  <!-- Modal: Create New Site -->
+  <div id="modal-create-site" class="modal-overlay">
+    <div class="modal-window">
+      <h2 class="modal-title">Register Construction Project</h2>
+      <form id="form-create-site">
+        <div class="form-group">
+          <label for="new-site-name">Project Name / Reference</label>
+          <input type="text" id="new-site-name" required placeholder="Ganges River Diversion Dam">
+        </div>
+        <div class="form-group">
+          <label for="new-site-location">Precise Location Details</label>
+          <input type="text" id="new-site-location" required placeholder="Sector 4, Haridwar, Uttarakhand">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="form-group">
+            <label for="new-site-date">Commencement Date</label>
+            <input type="date" id="new-site-date" required>
+          </div>
+          <div class="form-group">
+            <label for="new-site-type">Project Classification Type</label>
+            <select id="new-site-type" required>
+              <option value="Dam">Dam Project</option>
+              <option value="Road">Road Construction</option>
+              <option value="Bridge">Bridge Overpass</option>
+              <option value="Drain">Drainage / Canal</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="form-group">
+            <label for="new-site-budget">Contract Value (Budget ₹)</label>
+            <input type="number" id="new-site-budget" min="1000" required placeholder="8500000">
+          </div>
+          <div class="form-group">
+            <label for="new-site-duration">Target Duration (Days)</label>
+            <input type="number" id="new-site-duration" min="1" required placeholder="180">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Add Project Site</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Register Laborer -->
+  <div id="modal-create-laborer" class="modal-overlay">
+    <div class="modal-window">
+      <h2 class="modal-title">Register Labor Profile</h2>
+      <form id="form-create-laborer">
+        <div class="form-group">
+          <label for="new-labor-name">Labor Full Name</label>
+          <input type="text" id="new-labor-name" required placeholder="Ram Singh">
+        </div>
+        <div class="form-group">
+          <label for="new-labor-wage">Standard Daily Rate (₹)</label>
+          <input type="number" id="new-labor-wage" min="100" required placeholder="600">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Register Laborer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Catalog Item -->
+  <div id="modal-create-catalog" class="modal-overlay">
+    <div class="modal-window">
+      <h2 class="modal-title">Add Custom Tools Category</h2>
+      <form id="form-create-catalog">
+        <div class="form-group">
+          <label for="new-catalog-name">Tool Name</label>
+          <input type="text" id="new-catalog-name" required placeholder="Adjustable Centering Jack">
+        </div>
+        <div class="form-group">
+          <label for="new-catalog-cat">Category Classification</label>
+          <select id="new-catalog-cat" required>
+            <option value="Centering Plates">Centering Plates</option>
+            <option value="Catering & Scaffolding">Catering & Scaffolding</option>
+            <option value="Tower Cranes">Tower Cranes</option>
+            <option value="Hand Tools">Hand Tools</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="new-catalog-sizes">Size Variants (Comma Separated)</label>
+          <input type="text" id="new-catalog-sizes" required placeholder="3 feet, 6 feet, 9 feet">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Add to Catalog</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Return Tool Dispatch -->
+  <div id="modal-return-tool" class="modal-overlay">
+    <div class="modal-window">
+      <h2 class="modal-title">Logistics Return Dispatch</h2>
+      <form id="form-return-tool">
+        <input type="hidden" id="return-dep-id">
+        <div class="form-group">
+          <label id="return-tool-title">Returning: Centering Plate</label>
+          <p id="return-tool-limits" style="font-size: 0.85rem; color: var(--primary); margin-top: 4px;"></p>
+        </div>
+        <div class="form-group">
+          <label for="return-qty-input">Quantity Returned</label>
+          <input type="number" id="return-qty-input" min="1" required placeholder="50">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Log Return</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Damage & Repair Billing -->
+  <div id="modal-damage-repair" class="modal-overlay">
+    <div class="modal-window">
+      <h2 class="modal-title">Log Damages & Repair Cost</h2>
+      <form id="form-damage-repair">
+        <input type="hidden" id="damage-dep-id">
+        <div class="form-group">
+          <label id="damage-tool-title">Tool Unit: steel plate</label>
+        </div>
+        <div class="form-group">
+          <label for="damage-qty-input">Damaged Items Count</label>
+          <input type="number" id="damage-qty-input" min="0" required placeholder="2">
+        </div>
+        <div class="form-group">
+          <label for="repair-cost-input">Repair Cost Incurred (₹)</label>
+          <input type="number" id="repair-cost-input" min="0" required placeholder="500">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Log Damages & Bill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script Imports -->
+  <script src="database.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
